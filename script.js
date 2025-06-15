@@ -296,13 +296,13 @@ function startNextRound() {
 // STEP 3: Dati dei round
 function getRoundData(round) {
   const data = {
-    1: { moltiplicatore: 8, target: 104, descrizione: "PRESE x8" },
-    2: { moltiplicatore: 8, target: 208, descrizione: "CUORI x8" },
-    3: { moltiplicatore: 13, target: 312, descrizione: "K o J x13" },
-    4: { moltiplicatore: 26, target: 416, descrizione: "DONNE x26" },
-    5: { moltiplicatore: 52, target: 520, descrizione: "MANI 8/13" },
-    6: { moltiplicatore: 104, target: 624, descrizione: "K DI CUORI" },
-    7: { moltiplicatore: 1, target: 1248, descrizione: "EXTRA" },
+    1: { moltiplicatore: 8, target: 104, descrizione: "OGNI PRESA VALE 8" },
+    2: { moltiplicatore: 8, target: 208, descrizione: "OGNI CUORE VALE 8" },
+    3: { moltiplicatore: 13, target: 312, descrizione: "OGNI K O J VALE 13" },
+    4: { moltiplicatore: 26, target: 416, descrizione: "OGNI DONNA VALE 26" },
+    5: { moltiplicatore: 52, target: 520, descrizione: "MANO 8 E 13 VALGONO 52" },
+    6: { moltiplicatore: 104, target: 624, descrizione: "KAPPONE DI CUORI" },
+    7: { moltiplicatore: 1, target: 1248, descrizione: "UBER ALLES" },
   };
   return data[round];
 }
