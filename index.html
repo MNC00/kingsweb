@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>King's Game Score Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>King's Game Score Tracker</h1>
+
+    <section id="player-setup">
+      <h2>Inserisci i nomi dei 4 giocatori</h2>
+      <form id="player-form">
+        <input type="text" placeholder="Giocatore 1" required />
+        <input type="text" placeholder="Giocatore 2" required />
+        <input type="text" placeholder="Giocatore 3" required />
+        <input type="text" placeholder="Giocatore 4" required />
+        <button type="submit">Avvia Partita</button>
+      </form>
+    </section>
+
+    <section id="game-section" style="display: none;">
+      <h2 id="round-title"></h2>
+      <form id="round-form"></form>
+      <div class="scoreboard">
+        <h3>Punteggi attuali:</h3>
+        <ul id="score-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
