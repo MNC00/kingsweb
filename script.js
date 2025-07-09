@@ -49,15 +49,15 @@ function startNextRound() {
 
   // === MANO 5: MANI 8 E 13 ===
   if (currentRound === 5) {
-    roundTitle.textContent = "Mano 5: Chi ha preso la mano 8 e la mano 13? (52 punti ciascuna)";
+    roundTitle.textContent = "Round 5: 8º e 13º";
     roundForm.innerHTML = "";
 
     const label8 = document.createElement("label");
-    label8.textContent = "Chi ha preso la mano 8:";
+    label8.textContent = "Chi ha preso l' 8º:";
     const select8 = document.createElement("select");
 
     const label13 = document.createElement("label");
-    label13.textContent = "Chi ha preso la mano 13:";
+    label13.textContent = "Chi ha preso la 13º:";
     const select13 = document.createElement("select");
 
     for (const player in players) {
@@ -105,11 +105,11 @@ function startNextRound() {
 
   // === MANO 6: K DI CUORI ===
   if (currentRound === 6) {
-    roundTitle.textContent = "Mano 6: Chi ha preso il K di cuori? (+104 punti)";
+    roundTitle.textContent = "Round 6: Kappone";
     roundForm.innerHTML = "";
 
     const label = document.createElement("label");
-    label.textContent = "Giocatore:";
+    label.textContent = "Fortunato vincitore del Kappone:";
     const select = document.createElement("select");
 
     for (const player in players) {
@@ -151,7 +151,7 @@ function startNextRound() {
 
   // === MANO 7: PUNTEGGI EXTRA ===
   if (currentRound === 7) {
-    roundTitle.textContent = "Mano 7: Inserisci punteggi extra finché la somma non raggiunge 1248";
+    roundTitle.textContent = "Round 7: ÜBER ALLES";
     roundForm.innerHTML = "";
 
     const labelPlayer = document.createElement("label");
@@ -173,7 +173,7 @@ function startNextRound() {
       { label: "Cuori (x8)", name: "cuori", multiplier: 8 },
       { label: "J/K (x13)", name: "jk", multiplier: 13 },
       { label: "Donne (x26)", name: "donne", multiplier: 26 },
-      { label: "Mani 8/13 (x52)", name: "mani", multiplier: 52 },
+      { label: "8º/13º (x52)", name: "mani", multiplier: 52 },
     ];
 
     const inputs = {};
@@ -192,7 +192,7 @@ function startNextRound() {
 
     // K di cuori checkbox
     const labelK = document.createElement("label");
-    labelK.textContent = "Ha preso il K di cuori?";
+    labelK.textContent = "DETENTORE DEL KAPPONE?";
     const checkK = document.createElement("input");
     checkK.type = "checkbox";
     checkK.name = "kcuori";
@@ -245,7 +245,7 @@ function startNextRound() {
 
   // === ROUND STANDARD: MANI 1–4 ===
   const roundData = getRoundData(currentRound);
-  roundTitle.textContent = `Mano ${currentRound}: ${roundData.descrizione}`;
+  roundTitle.textContent = `Round ${currentRound}: ${roundData.descrizione}`;
   roundForm.innerHTML = "";
 
   for (const player in players) {
