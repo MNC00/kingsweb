@@ -1,33 +1,36 @@
-/* === GENERAL RESET & FONTS === */
+/* === CSS COMMENTATO E RESPONSIVE === */
 @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Reset base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Corpo principale */
 body {
-  font-family: 'Amatic SC', cursive;
-  background-color: #fffbea;
-  color: #4a2c00;
+  font-family: 'Amatic SC', cursive; /* Font cartoon */
+  background-color: #fffbea; /* Sfondo chiaro caldo */
+  color: #4a2c00; /* Testo principale marrone */
   line-height: 1.6;
   padding: 1rem;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* Per spingere il footer in basso */
 }
 
-/* === HERO === */
+/* Intestazione */
 .hero {
   text-align: center;
   padding: 2rem 1rem;
 }
 
 .logo {
-  width: 100px;
+  width: 220px; /* Logo grande di default */
+  max-width: 90%; /* Limita su schermi piccoli */
+  height: auto;
   margin-bottom: 1rem;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.2));
 }
 
+/* Titoli */
 h1, h2, h3 {
   color: #8b2f00;
   font-weight: 700;
@@ -38,8 +41,9 @@ h1 {
   margin-bottom: 0.5rem;
 }
 
-/* === CONTAINER === */
+/* Contenitore principale */
 .container {
+  flex: 1;
   max-width: 900px;
   margin: auto;
   background: #fff7da;
@@ -50,16 +54,14 @@ h1 {
   transition: all 0.3s ease-in-out;
 }
 
-/* === FORMS === */
+/* Form */
 form {
   display: grid;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-input[type="text"],
-input[type="number"],
-select {
+input[type="text"], input[type="number"], select {
   padding: 0.6rem;
   font-size: 1.2rem;
   background: #fff;
@@ -72,10 +74,10 @@ select {
 
 input:focus, select:focus {
   outline: none;
-  border-color: #8b2f00;
+  border-color: #8b2f00; /* Highlight focus */
 }
 
-/* === BUTTONS === */
+/* Pulsanti */
 button {
   padding: 0.7rem 1rem;
   font-size: 1.5rem;
@@ -90,11 +92,11 @@ button {
 }
 
 button:hover {
-  transform: scale(1.05);
+  transform: scale(1.05); /* Ingrandisce leggermente */
   background-color: #ffd52b;
 }
 
-/* === SCOREBOARD === */
+/* Scoreboard */
 .scoreboard {
   margin-top: 2rem;
   background-color: #fff5c2;
@@ -122,16 +124,38 @@ button:hover {
   color: #d00000;
 }
 
-/* === TRANSITIONS === */
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+footer a {
+  color: #8b2f00;
+  margin: 0 0.5rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover {
+  color: #d00000;
+}
+
+/* Transizioni generali */
 section, input, button, select {
   transition: all 0.3s ease;
 }
 
+/* Responsive per schermi piccoli */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
   }
   h1 {
     font-size: 2.5rem;
+  }
+  .logo {
+    width: 160px; /* Logo più piccolo su mobile */
   }
 }
