@@ -13,7 +13,6 @@ const roundTitle = document.getElementById("round-title");
 const roundForm = document.getElementById("round-form");
 const scoreList = document.getElementById("score-list");
 const container = document.querySelector('.container'); // wrapper main
-const gameSectionImgWrapper = document.getElementById('game-section'); // area di gioco
 
 playerForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -45,18 +44,14 @@ function startNextRound() {
     roundTitle.textContent = "Partita terminata! 🏁";
     roundForm.innerHTML = "";
 
-    // Mostra foto carloRe.jpeg
     const endImage = document.createElement('img');
-    endImage.src = './carloRe.png'; // percorso relativo corretto
-    endImage.alt = 'Foto di Carlo Re';
+    endImage.src = './carloRe.png';
+    endImage.alt = 'Foto di fine partita';
     endImage.classList.add('end-photo');
 
-    if (gameSectionImgWrapper) {
-      gameSectionImgWrapper.appendChild(endImage);
-      console.log('DEBUG: elemento immagine aggiunto');
-    } else {
-      console.error('DEBUG: wrapper game-section non trovato');
-    }
+    // Appendi l'immagine alla sezione di gioco
+    gameSection.appendChild(endImage);
+    console.log('DEBUG: elemento immagine aggiunto');
     return;
   }
 
