@@ -1,40 +1,58 @@
 /* ============================
-   CSS RESTYLING COMPLETO
-   Commenti dettagliati riga per riga e per blocco
+   CSS COMPLETO RIVISITATO (AGGIORNATO)
+   Titoli dei box più grandi, centrati, in grassetto
    ============================ */
 
-/* --- IMPORT FONTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
 
-/* --- RESET BASE --- */
 * {
-  box-sizing: border-box; /* Gestisce padding e border nel box model */
-  margin: 0; /* Elimina margini di default */
-  padding: 0; /* Elimina padding di default */
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* --- BODY SETUP --- */
 body {
-  font-family: 'Amatic SC', cursive; /* Font principale giocoso */
-  background-color: #fefefe; /* Sfondo chiaro pulito */
-  color: #333; /* Colore testo principale */
+  font-family: 'Amatic SC', cursive;
+  background-color: #fefefe;
+  color: #333;
   line-height: 1.6;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* --- HEADER HERO --- */
 .hero {
+  background:
+    url('logo-cinghiale_finoaquandonocelo.png') no-repeat center center,
+    linear-gradient(135deg, #ffda77 0%, #ffd24c 100%);
+  /* contain mantiene le proporzioni originali del logo */
+  background-size: contain, cover;
+  height: 250px;      /* regola a piacere */
+  padding: 0;
+}
+
+/* 2) Titolo senza bordi */
+.title-section h1 {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  /* Se però vuoi un piccolo padding coerente col resto: */
+  /* padding: 0.5rem 1rem !important; */
+}
+
+/* Eventuale aggiustamento margini per .title-section */
+.title-section {
   text-align: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #ffda77 0%, #ffd24c 100%); /* Sfondo gradiente caldo */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombra soft */
+  margin: 0;
+  padding: 2rem 0;
 }
 
 .logo {
-  width: 220px; /* Dimensione logo desktop */
-  max-width: 90%; /* Responsivo su schermi piccoli */
+  width: 15vw; /* Larghezza in percentuale della viewport (schermo) */
+  max-width: 220px; /* Massima larghezza */
+  min-width: 100px; /* Larghezza minima per non diventare troppo piccolo */
   height: auto;
   margin-bottom: 1rem;
 }
@@ -46,32 +64,44 @@ h1 {
 
 h2, h3 {
   color: #8b2f00;
+  text-align: center; /* Centrati */
+  font-size: 2rem;    /* Più grandi */
+  font-weight: bold;  /* Grassetto */
+  margin-bottom: 1rem;
 }
 
-/* --- MAIN CONTAINER --- */
 .container {
   flex: 1;
-  max-width: 900px;
+  width: 50%;
   margin: 2rem auto;
   background: #fff;
   border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Ombra più moderna */
+  padding: 3rem 4rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease-in-out;
 }
 
-/* --- FORM STYLE --- */
 form {
   display: grid;
   gap: 1rem;
   margin-top: 1rem;
 }
 
+form label {
+  font-size: 1.6rem; /* Più grande */
+  font-weight: bold; /* Grassetto */
+  color: #8b2f00;
+  text-align: left;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+
 input[type="text"],
 input[type="number"],
 select {
-  padding: 0.6rem;
-  font-size: 1.2rem;
+  padding: 0.8rem;
+  font-size: 1.4rem;
   background: #f9f9f9;
   border: 2px solid #ffd24c;
   border-radius: 12px;
@@ -85,10 +115,9 @@ select:focus {
   background: #fffbe6;
 }
 
-/* --- BUTTON STYLE --- */
 button {
-  padding: 0.8rem 1.2rem;
-  font-size: 1.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.6rem;
   font-weight: bold;
   background: linear-gradient(135deg, #ffd24c 0%, #ff9900 100%);
   color: #4a2c00;
@@ -103,12 +132,11 @@ button:hover {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* --- SCOREBOARD --- */
 .scoreboard {
   margin-top: 2rem;
   background: #fffbe6;
   border: 2px solid #ffd24c;
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
 }
@@ -122,18 +150,19 @@ button:hover {
 #score-list li {
   padding: 0.5rem 0;
   border-bottom: 1px dashed #ffd24c;
-  font-size: 1.4rem;
+  font-size: 1.6rem; /* Più grande */
   color: #8b2f00;
+  font-weight: bold; /* Grassetto */
+  text-align: center; /* Centrato */
 }
 
 #score-list li:last-child {
   border-bottom: none;
 }
 
-/* --- FOOTER --- */
 footer {
-  background: #fff8e1; /* Sfondo footer delicato */
-  padding: 1.5rem 1rem;
+  background: #333;
+  padding: 2rem 1rem;
   text-align: center;
   margin-top: 2rem;
 }
@@ -142,34 +171,43 @@ footer {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .footer-links a {
-  color: #8b2f00;
+  color: #fff;
   text-decoration: none;
+  font-size: 1.9rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: color 0.3s;
+  transition: color 0.3s, transform 0.3s;
 }
 
 .footer-links a:hover {
-  color: #ff9900;
+  color: #ffd24c;
+  transform: translateY(-3px);
 }
 
 .footer-links i {
-  margin-bottom: 0.3rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .footer-links span {
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
-/* --- MEDIA QUERY: MOBILE --- */
+@media (max-width: 1200px) {
+  .container {
+    width: 70%;
+  }
+}
+
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    width: 90%;
+    padding: 1rem 2rem;
   }
 
   h1 {
@@ -177,6 +215,6 @@ footer {
   }
 
   .logo {
-    width: 160px;
+    width: 30%;
   }
 }

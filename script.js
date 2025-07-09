@@ -1,24 +1,22 @@
 // =============================
-// SCRIPT PRINCIPALE
-// Aggiunti commenti extra per maggiore chiarezza
+// SCRIPT PRINCIPALE AGGIORNATO
+// Mostra foto "carloRe.jpeg" quando la partita termina
 // =============================
 
-// Oggetto per memorizzare i punteggi dei giocatori
 let players = {};
 let currentRound = 0;
 const totalRounds = 7;
 
-// Recupero elementi dal DOM
 const playerForm = document.getElementById("player-form");
 const gameSection = document.getElementById("game-section");
 const roundTitle = document.getElementById("round-title");
 const roundForm = document.getElementById("round-form");
 const scoreList = document.getElementById("score-list");
+const container = document.querySelector('.container'); // wrapper main
+const gameSectionImgWrapper = document.getElementById('game-section'); // area di gioco
 
-// Quando si avvia la partita
 playerForm.addEventListener("submit", function (event) {
   event.preventDefault();
-
   const inputs = playerForm.querySelectorAll("input[type='text']");
   players = {};
 
@@ -26,7 +24,6 @@ playerForm.addEventListener("submit", function (event) {
     const name = input.value.trim().toLowerCase();
     const fallback = `giocatore${index + 1}`;
     const finalName = name || fallback;
-
     if (players[finalName]) {
       players[`${finalName}_${index}`] = 0;
     } else {
@@ -39,13 +36,27 @@ playerForm.addEventListener("submit", function (event) {
   startNextRound();
 });
 
-// Avvia il round successivo
 function startNextRound() {
   currentRound++;
 
+  // Fine partita
   if (currentRound > totalRounds) {
+    console.log('DEBUG: partita terminata, currentRound=', currentRound);
     roundTitle.textContent = "Partita terminata! 🏁";
     roundForm.innerHTML = "";
+
+    // Mostra foto carloRe.jpeg
+    const endImage = document.createElement('img');
+    endImage.src = './carloRe.png'; // percorso relativo corretto
+    endImage.alt = 'Foto di Carlo Re';
+    endImage.classList.add('end-photo');
+
+    if (gameSectionImgWrapper) {
+      gameSectionImgWrapper.appendChild(endImage);
+      console.log('DEBUG: elemento immagine aggiunto');
+    } else {
+      console.error('DEBUG: wrapper game-section non trovato');
+    }
     return;
   }
 
