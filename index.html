@@ -4,17 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>King's Game Score Tracker</title>
+  
+  <!-- Link al nuovo CSS completamente rivisitato -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Font esterno -->
   <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome per icone social -->
+  <script src="https://kit.fontawesome.com/yourkitid.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
 
+  <!-- === HEADER === -->
+  <!-- Logo e titolo del sito -->
   <header class="hero">
     <img src="logo-cinghiale.png" alt="Logo" class="logo" />
     <h1>King's Game Score Tracker</h1>
   </header>
 
+  <!-- === MAIN CONTAINER === -->
   <main class="container">
+
+    <!-- Sezione per inserire i nomi dei giocatori -->
     <section id="player-setup">
       <h2>Inserisci i nomi dei 4 giocatori</h2>
       <form id="player-form">
@@ -26,6 +39,7 @@
       </form>
     </section>
 
+    <!-- Sezione di gioco, nascosta finché non si avvia -->
     <section id="game-section" style="display: none;">
       <h2 id="round-title"></h2>
       <form id="round-form"></form>
@@ -36,13 +50,31 @@
     </section>
   </main>
 
+  <!-- === FOOTER MODERNO === -->
+  <!-- Wrapper per footer centrato, con icone grandi sopra e testo sotto -->
   <footer>
-    <a href="https://www.facebook.com/groups/quellicun/?rdid=sqOFT8R2PzMyk3bH&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2FPw7fBCL9K2JxteAL%2F#" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
-    <a href="https://www.instagram.com/pgstimm/?igsh=MTM1bmFiM3VtYTRkcg%3D%3D#" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-    <a href="https://www.youtube.com/channel/UCkIHoucSwN5LVSh0KqKuf4g?app=desktop&fbclid=PAZXh0bgNhZW0CMTEAAab7S3i3Vnxivz53W5WDMo0oFRsTfXFpf_EHH6HuaOX8GELYSrtD31lgphI_aem_ASjc4ARhs58cFcoOMuOGzHEYkFYfVx4kEuqiFNcX8PsPAM5bLeeF0-IAR-JKHEFYypjbnieTt-nPecJN46vW261C" target="_blank"><i class="fab fa-youtube"></i> YouTube</a>
-    <a href="https://sites.google.com/view/pgstimm/cunfest?authuser=0" target="_blank"><i class="fas fa-globe"></i> Website</a>
+    <div class="footer-links">
+      <!-- Ogni link social ha un'icona grande -->
+      <a href="https://www.facebook.com/groups/quellicun/" target="_blank">
+        <i class="fab fa-facebook fa-2x"></i>
+        <span>Facebook</span>
+      </a>
+      <a href="https://www.instagram.com/pgstimm/" target="_blank">
+        <i class="fab fa-instagram fa-2x"></i>
+        <span>Instagram</span>
+      </a>
+      <a href="https://www.youtube.com/channel/UCkIHoucSwN5LVSh0KqKuf4g" target="_blank">
+        <i class="fab fa-youtube fa-2x"></i>
+        <span>YouTube</span>
+      </a>
+      <a href="https://sites.google.com/view/pgstimm/cunfest" target="_blank">
+        <i class="fas fa-globe fa-2x"></i>
+        <span>Website</span>
+      </a>
+    </div>
   </footer>
 
+  <!-- Script JS principale -->
   <script src="script.js"></script>
 </body>
 </html>

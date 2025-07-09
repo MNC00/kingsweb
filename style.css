@@ -1,106 +1,113 @@
-/* === CSS COMMENTATO E RESPONSIVE === */
+/* ============================
+   CSS RESTYLING COMPLETO
+   Commenti dettagliati riga per riga e per blocco
+   ============================ */
+
+/* --- IMPORT FONTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap');
 
-/* Reset base */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* Corpo principale */
-body {
-  font-family: 'Amatic SC', cursive; /* Font cartoon */
-  background-color: #fffbea; /* Sfondo chiaro caldo */
-  color: #4a2c00; /* Testo principale marrone */
-  line-height: 1.6;
-  padding: 1rem;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column; /* Per spingere il footer in basso */
+/* --- RESET BASE --- */
+* {
+  box-sizing: border-box; /* Gestisce padding e border nel box model */
+  margin: 0; /* Elimina margini di default */
+  padding: 0; /* Elimina padding di default */
 }
 
-/* Intestazione */
+/* --- BODY SETUP --- */
+body {
+  font-family: 'Amatic SC', cursive; /* Font principale giocoso */
+  background-color: #fefefe; /* Sfondo chiaro pulito */
+  color: #333; /* Colore testo principale */
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- HEADER HERO --- */
 .hero {
   text-align: center;
   padding: 2rem 1rem;
+  background: linear-gradient(135deg, #ffda77 0%, #ffd24c 100%); /* Sfondo gradiente caldo */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombra soft */
 }
 
 .logo {
-  width: 220px; /* Logo grande di default */
-  max-width: 90%; /* Limita su schermi piccoli */
+  width: 220px; /* Dimensione logo desktop */
+  max-width: 90%; /* Responsivo su schermi piccoli */
   height: auto;
   margin-bottom: 1rem;
-  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.2));
-}
-
-/* Titoli */
-h1, h2, h3 {
-  color: #8b2f00;
-  font-weight: 700;
 }
 
 h1 {
   font-size: 3rem;
-  margin-bottom: 0.5rem;
+  color: #8b2f00;
 }
 
-/* Contenitore principale */
+h2, h3 {
+  color: #8b2f00;
+}
+
+/* --- MAIN CONTAINER --- */
 .container {
   flex: 1;
   max-width: 900px;
-  margin: auto;
-  background: #fff7da;
-  border: 3px dashed #f5c100;
+  margin: 2rem auto;
+  background: #fff;
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 6px 6px 0 #f5c100;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Ombra più moderna */
   transition: all 0.3s ease-in-out;
 }
 
-/* Form */
+/* --- FORM STYLE --- */
 form {
   display: grid;
   gap: 1rem;
   margin-top: 1rem;
 }
 
-input[type="text"], input[type="number"], select {
+input[type="text"],
+input[type="number"],
+select {
   padding: 0.6rem;
   font-size: 1.2rem;
-  background: #fff;
-  border: 2px solid #f5c100;
+  background: #f9f9f9;
+  border: 2px solid #ffd24c;
   border-radius: 12px;
-  color: #4a2c00;
-  font-family: 'Amatic SC', cursive;
-  transition: border 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
-  border-color: #8b2f00; /* Highlight focus */
+  border-color: #ff9900;
+  background: #fffbe6;
 }
 
-/* Pulsanti */
+/* --- BUTTON STYLE --- */
 button {
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 1.2rem;
   font-size: 1.5rem;
   font-weight: bold;
-  background-color: #f5c100;
+  background: linear-gradient(135deg, #ffd24c 0%, #ff9900 100%);
   color: #4a2c00;
-  border: 2px solid #8b2f00;
+  border: none;
   border-radius: 12px;
   cursor: pointer;
-  font-family: 'Amatic SC', cursive;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button:hover {
-  transform: scale(1.05); /* Ingrandisce leggermente */
-  background-color: #ffd52b;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Scoreboard */
+/* --- SCOREBOARD --- */
 .scoreboard {
   margin-top: 2rem;
-  background-color: #fff5c2;
-  border: 2px solid #f5c100;
+  background: #fffbe6;
+  border: 2px solid #ffd24c;
   padding: 1rem;
   border-radius: 12px;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
@@ -114,48 +121,62 @@ button:hover {
 
 #score-list li {
   padding: 0.5rem 0;
-  border-bottom: 1px dashed #f5c100;
+  border-bottom: 1px dashed #ffd24c;
   font-size: 1.4rem;
   color: #8b2f00;
+}
+
+#score-list li:last-child {
+  border-bottom: none;
+}
+
+/* --- FOOTER --- */
+footer {
+  background: #fff8e1; /* Sfondo footer delicato */
+  padding: 1.5rem 1rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  color: #8b2f00;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: color 0.3s;
 }
 
-#score-list li:hover {
-  color: #d00000;
+.footer-links a:hover {
+  color: #ff9900;
 }
 
-/* Footer */
-footer {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 1.5rem;
+.footer-links i {
+  margin-bottom: 0.3rem;
 }
 
-footer a {
-  color: #8b2f00;
-  margin: 0 0.5rem;
-  text-decoration: none;
-  transition: color 0.2s;
+.footer-links span {
+  font-size: 1rem;
 }
 
-footer a:hover {
-  color: #d00000;
-}
-
-/* Transizioni generali */
-section, input, button, select {
-  transition: all 0.3s ease;
-}
-
-/* Responsive per schermi piccoli */
+/* --- MEDIA QUERY: MOBILE --- */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
   }
+
   h1 {
     font-size: 2.5rem;
   }
+
   .logo {
-    width: 160px; /* Logo più piccolo su mobile */
+    width: 160px;
   }
 }
