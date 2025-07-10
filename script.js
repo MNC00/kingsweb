@@ -183,87 +183,123 @@ document.addEventListener('DOMContentLoaded', () => {
     updateScoreboard();
   }
 
-  // — Round finale 7 —
-  let accumulatedTotal = 0;
+  // — Round finale 7 —  
+  let accumulatedTotal = 0;       // punti già inseriti in questo round  
+  let firstEntryDone   = false;   // true dopo il primo inserimento  
+  let firstEntryPoints = 0;       // punteggio del primo inserimento  
 
-  // — Round finale 7 con accumulo fino a 624 —
   function handleFinalRound() {
-    roundTitle.textContent = "Round 7: ÜBER ALLES";
-    roundForm.innerHTML = "";
+    // reset testata e form  
+    roundTitle.textContent = "Round 7: ÜBER ALLES";  
+    roundForm.innerHTML = "";  
 
-    const selPlayer = document.createElement("select");
-    Object.keys(players).forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p;
-      opt.textContent = capitalize(p);
-      selPlayer.appendChild(opt);
-    });
-    const lblP = document.createElement("label");
-    lblP.textContent = "Giocatore:";
-    roundForm.append(lblP, selPlayer);
+    // select giocatore  
+    const selPlayer = document.createElement("select");  
+    Object.keys(players).forEach(p => {  
+      const opt = document.createElement("option");  
+      opt.value = p;  
+      opt.textContent = capitalize(p);  
+      selPlayer.appendChild(opt);  
+    });  
+    const lblP = document.createElement("label");  
+    lblP.textContent = "Giocatore:";  
+    roundForm.append(lblP, selPlayer);  
 
-    const fields = [
-      { lbl: "Prese (x8)",  name: "prese", mult: 8 },
-      { lbl: "Cuori (x8)",  name: "cuori", mult: 8 },
-      { lbl: "J/K (x13)",   name: "jk",    mult: 13 },
-      { lbl: "Donne (x26)", name: "donne", mult: 26 },
-      { lbl: "8º/13º (x52)",name: "mani",  mult: 52 },
-    ];
-    const inputs = {};
-    fields.forEach(f => {
-      const lbl = document.createElement("label");
-      lbl.textContent = f.lbl;
-      const inp = document.createElement("input");
-      inp.type = "number";
-      inp.min = "0";
-      inp.name = f.name;
-      inputs[f.name] = { el: inp, mult: f.mult };
-      roundForm.append(lbl, inp);
-    });
+    // campi di input  
+    const fields = [  
+      { lbl: "Prese (x8)",   name: "prese", mult: 8 },  
+      { lbl: "Cuori (x8)",   name: "cuori", mult: 8 },  
+      { lbl: "J/K (x13)",    name: "jk",    mult: 13 },  
+      { lbl: "Donne (x26)",  name: "donne", mult: 26 },  
+      { lbl: "8º/13º (x52)", name: "mani",  mult: 52 },  
+    ];  
+    const inputs = {};  
+    fields.forEach(f => {  
+      const lbl = document.createElement("label");  
+      lbl.textContent = f.lbl;  
+      const inp = document.createElement("input");  
+      inp.type = "number";  inp.min = "0";  inp.name = f.name;  
+      inputs[f.name] = { el: inp, mult: f.mult };  
+      roundForm.append(lbl, inp);  
+    });  
 
-    const lblK = document.createElement("label");
-    lblK.textContent = "Kappone?";
-    const checkK = document.createElement("input");
-    checkK.type = "checkbox";
-    checkK.name = "kappone";
-    roundForm.append(lblK, checkK);
+    // checkbox Kappone  
+    const lblK = document.createElement("label");  
+    lblK.textContent = "Kappone?";  
+    const checkK = document.createElement("input");  
+    checkK.type = "checkbox";  checkK.name = "kappone";  
+    roundForm.append(lblK, checkK);  
 
-    const btn = document.createElement("button");
-    btn.type = "button"; // changed to button to use click listener
-    btn.textContent = "Aggiungi punteggi";
-    roundForm.appendChild(btn);
+    // bottone aggiungi  
+    const btn = document.createElement("button");  
+    btn.type = "button";  
+    btn.textContent = "Aggiungi punteggi";  
+    roundForm.appendChild(btn);  
 
-    // Gestione del click sul bottone
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      let roundTotal = 0;
-      for (const key in inputs) {
-        roundTotal += (parseInt(inputs[key].el.value) || 0) * inputs[key].mult;
-      }
-      if (checkK.checked) roundTotal += 104;
+    btn.addEventListener('click', e => {  
+      e.preventDefault();  
 
-      if (accumulatedTotal + roundTotal > 624) {
-        alert("Attenzione: il totale accumulato supererebbe 624 punti. Rivedi i valori inseriti.");
-        return;
-      }
+      // calcolo totale del giro  
+      let roundTotal = 0;  
+      for (const key in inputs) {  
+        roundTotal += (parseInt(inputs[key].el.value) || 0) * inputs[key].mult;  
+      }  
+      if (checkK.checked) roundTotal += 104;  
 
-      accumulatedTotal += roundTotal;
-      players[selPlayer.value] += roundTotal;
-      updateScoreboard();
+      // controllo overflow assoluto  
+      if (roundTotal > 624 || accumulatedTotal + roundTotal > 624) {  
+        alert("Attenzione: supereresti i 624 punti totali. Rivedi i valori.");  
+        return;  
+      }  
 
-      if (accumulatedTotal === 624) {
-        roundTitle.textContent = "Punteggio finale raggiunto! 🏆";
-        roundForm.innerHTML = "";
-        showEndOverlay();
-      } else {
-        Object.values(inputs).forEach(o => o.el.value = "");
-        checkK.checked = false;
-        const remaining = 624 - accumulatedTotal;
-        roundTitle.textContent = `Ancora ${remaining} punti da inserire`;
-      }
-    });
+      // PRIMO INSERIMENTO: controllo chiusura anticipata  
+      if (!firstEntryDone) {  
+        const remainingAfterFirst = 624 - roundTotal;  
+        // aggiorno classifica  
+        players[selPlayer.value] += roundTotal;  
+        updateScoreboard();  
 
-    updateScoreboard();
+        // se i punti rimanenti non bastano a superare il primo, chiudo  
+        if (remainingAfterFirst < roundTotal) {  
+          roundTitle.textContent = "Punteggio finale raggiunto! 🏆";  
+          roundForm.innerHTML = "";  
+          showEndOverlay();  
+          return;  
+        }  
+
+        // altrimenti preparo per il secondo inserimento  
+        firstEntryDone   = true;  
+        firstEntryPoints = roundTotal;  
+        accumulatedTotal = roundTotal;  
+        // disabilito il giocatore già usato  
+        selPlayer.querySelector(`option[value="${selPlayer.value}"]`).disabled = true;  
+
+        // reset degli input  
+        Object.values(inputs).forEach(o => o.el.value = "");  
+        checkK.checked = false;  
+        roundTitle.textContent = `Ancora ${remainingAfterFirst} punti da inserire`;  
+        return;  
+      }  
+
+      // INSERIMENTI SUCCESSIVI: accumulo fino a 624  
+      accumulatedTotal += roundTotal;  
+      players[selPlayer.value] += roundTotal;  
+      updateScoreboard();  
+
+      if (accumulatedTotal === 624) {  
+        roundTitle.textContent = "Punteggio finale raggiunto! 🏆";  
+        roundForm.innerHTML = "";  
+        showEndOverlay();  
+      } else {  
+        const remaining = 624 - accumulatedTotal;  
+        selPlayer.querySelector(`option[value="${selPlayer.value}"]`).disabled = true;  
+        Object.values(inputs).forEach(o => o.el.value = "");  
+        checkK.checked = false;  
+        roundTitle.textContent = `Ancora ${remaining} punti da inserire`;  
+      }  
+    });  
+
+    updateScoreboard();  
   }
 
 
