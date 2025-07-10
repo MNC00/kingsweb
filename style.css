@@ -83,8 +83,17 @@ h2, h3 {
 
 form {
   display: grid;
+  grid-template-columns: 1fr; /* una sola colonna */
   gap: 1rem;
-  margin-top: 1rem;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+button {
+  width: 100%;      /* riempie sempre tutta la larghezza disponibile */
+  min-width: 0;     /* permette la riduzione sotto il minimo contenuto */
+  box-sizing: border-box;
 }
 
 form label {
@@ -204,17 +213,20 @@ footer {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .container {
-    width: 90%;
-    padding: 1rem 2rem;
+    max-width: 100%;
+    padding: 0.8rem;
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
-  .logo {
-    width: 30%;
+  input,
+  select,
+  button {
+    font-size: 1.1rem;
+    padding: 0.5rem;
   }
 }
