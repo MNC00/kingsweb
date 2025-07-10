@@ -23,7 +23,7 @@ body {
 
 .hero {
   background:
-    url('logo-cinghiale_finoaquandonocelo.png') no-repeat center center,
+    url('logo-cinghiale.png') no-repeat center center,
     linear-gradient(135deg, #ffda77 0%, #ffd24c 100%);
   /* contain mantiene le proporzioni originali del logo */
   background-size: contain, cover;
@@ -229,4 +229,81 @@ footer {
     font-size: 1.1rem;
     padding: 0.5rem;
   }
+}
+
+/* Responsive per schermi piccoli */
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  h1 { font-size: 2.5rem; }
+  .logo { width: 160px; }
+}
+
+/* ===== STILE OVERLAY FINE PARTITA ===== */
+#end-screen {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+#end-screen img {
+  max-width: 90%; max-height: 90%;
+  width: auto; height: auto;
+  border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+/* Pulsante chiusura */
+.close-end-screen {
+  position: absolute; top: 1rem; right: 1rem;
+  background: transparent; border: none;
+  font-size: 2rem; color: #fff;
+  cursor: pointer; line-height: 1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #end-screen img { max-width: 100%; max-height: 100%; }
+}
+
+
+/* Banner “Il king è …” */
+/* 1) Rendiamo l’overlay una colonna */
+#end-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;              /* già c’era */
+  flex-direction: column;     /* AGGIUNTO: impila banner+immagine */
+  align-items: center;        /* AGGIUNTO: centra orizzontalmente */
+  justify-content: center;    /* AGGIUNTO: centra verticalmente */
+  z-index: 1000;
+}
+
+/* 2) Banner sopra l’immagine: rimuoviamo absolute e lo mettiamo in flow */
+/* Banner “Il king è …” */
+.end-banner {
+  margin-bottom: 1rem;        /* spazio sotto al banner */
+  background: #ffd24c;
+  color: #8b2f00;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 3rem;            /* testo più grande */
+  font-weight: 900;           /* extra bold */
+  animation: pulse 1.5s ease-in-out infinite;
+  z-index: 1001;              /* sopra l’immagine */
+}
+
+/* Pulsazione (se già non ce l’hai) */
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.05); }
+}
+
+/* 3) (Opzionale) Se vuoi regolare leggermente il top della “✖️” */
+.close-end-screen {
+  top: 1rem;                   /* già c’era */
+  right: 1rem;
+  z-index: 1001;               /* sopra banner e immagine */
 }

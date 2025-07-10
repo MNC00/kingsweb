@@ -1,306 +1,293 @@
 // =============================
-// SCRIPT PRINCIPALE AGGIORNATO
-// Mostra foto "carloRe.jpeg" quando la partita termina
+// script.js
+// Gestione partita, round speciali e overlay + risultato finale
 // =============================
+document.addEventListener('DOMContentLoaded', () => {
+  // — Riferimenti DOM —
+  const playerForm       = document.getElementById("player-form");
+  const setupSection     = document.getElementById("player-setup");
+  const gameSection      = document.getElementById("game-section");
+  const roundTitle       = document.getElementById("round-title");
+  const roundForm        = document.getElementById("round-form");
+  const scoreList        = document.getElementById("score-list");
+  const scoreboardHeader = document.querySelector(".scoreboard h3");
+  const endScreen        = document.getElementById("end-screen");
+  const closeButton      = document.getElementById("close-end-screen");
 
-let players = {};
-let currentRound = 0;
-const totalRounds = 7;
+  // — Nascondi subito l’overlay —
+  endScreen.style.display = "none";
 
-const playerForm = document.getElementById("player-form");
-const gameSection = document.getElementById("game-section");
-const roundTitle = document.getElementById("round-title");
-const roundForm = document.getElementById("round-form");
-const scoreList = document.getElementById("score-list");
-const container = document.querySelector('.container'); // wrapper main
-
-playerForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-  const inputs = playerForm.querySelectorAll("input[type='text']");
-  players = {};
-
-  inputs.forEach((input, index) => {
-    const name = input.value.trim().toLowerCase();
-    const fallback = `giocatore${index + 1}`;
-    const finalName = name || fallback;
-    if (players[finalName]) {
-      players[`${finalName}_${index}`] = 0;
-    } else {
-      players[finalName] = 0;
-    }
+  // — click sulla “✖️” chiude solo l’overlay —
+  closeButton.addEventListener("click", () => {
+    endScreen.style.display = "none";
   });
 
-  document.getElementById("player-setup").style.display = "none";
-  gameSection.style.display = "block";
-  startNextRound();
-});
+  // — Stato di gioco —
+  let players = {};
+  let currentRound = 0;
+  const totalRounds = 7;
 
-function startNextRound() {
-  currentRound++;
+  // — Avvio partita: leggi nomi, resetta stato, mostra sezione di gioco —
+  playerForm.addEventListener("submit", event => {
+    event.preventDefault();
+    players = {};
+    currentRound = 0;
 
-  // Fine partita
-  if (currentRound > totalRounds) {
-    console.log('DEBUG: partita terminata, currentRound=', currentRound);
-    roundTitle.textContent = "Partita terminata! 🏁";
-    roundForm.innerHTML = "";
+    playerForm.querySelectorAll("input[type='text']").forEach((inp, i) => {
+      const raw = inp.value.trim().toLowerCase();
+      const key = raw || `giocatore${i+1}`;
+      // previeni nomi duplicati
+      players[key in players ? `${key}_${i}` : key] = 0;
+    });
 
-    const endImage = document.createElement('img');
-    endImage.src = './carloRe.png';
-    endImage.alt = 'Foto di fine partita';
-    endImage.classList.add('end-photo');
+    setupSection.style.display = "none";
+    gameSection.style.display = "block";
+    scoreboardHeader.textContent = "Punteggi attuali:";
+    updateScoreboard();
+    startNextRound();
+  });
 
-    // Appendi l'immagine alla sezione di gioco
-    gameSection.appendChild(endImage);
-    console.log('DEBUG: elemento immagine aggiunto');
-    return;
-  }
+  // — Procedi al round successivo —
+  function startNextRound() {
+    currentRound++;
 
-  // Logica per round speciali
-  if (currentRound === 5) {
-    handleSpecialRound5();
-    return;
-  }
-  if (currentRound === 6) {
-    handleSpecialRound6();
-    return;
-  }
-  if (currentRound === 7) {
-    handleFinalRound();
-    return;
-  }
-
-  // Round standard (1–4)
-  const roundData = getRoundData(currentRound);
-  roundTitle.textContent = `Round ${currentRound}: ${roundData.descrizione}`;
-  roundForm.innerHTML = "";
-
-  for (const player in players) {
-    const label = document.createElement("label");
-    label.textContent = `${capitalize(player)}:`;
-
-    const input = document.createElement("input");
-    input.type = "number";
-    input.min = "0";
-    input.name = player;
-
-    roundForm.appendChild(label);
-    roundForm.appendChild(input);
-  }
-
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "Conferma Round";
-  submitBtn.type = "submit";
-  roundForm.appendChild(submitBtn);
-
-  roundForm.onsubmit = function (e) {
-    e.preventDefault();
-    const formData = new FormData(roundForm);
-    let roundSum = 0;
-    const oldScores = { ...players };
-
-    for (const [player, value] of formData.entries()) {
-      const val = parseInt(value || "0");
-      const delta = val * roundData.moltiplicatore;
-      players[player] += delta;
-      roundSum += delta;
+    // se ho superato l’ultimo round, mostro overlay
+    if (currentRound > totalRounds) {
+      return showEndOverlay();
     }
 
-    if (roundSum > roundData.target) {
-      alert(`Errore: somma ${roundSum} > target ${roundData.target}. Riprova.`);
-      players = oldScores;
+    // round speciali
+    if (currentRound === 5) return handleSpecialRound5();
+    if (currentRound === 6) return handleSpecialRound6();
+    if (currentRound === 7) return handleFinalRound();
+
+    // round 1–4 standard
+    const data = getRoundData(currentRound);
+    roundTitle.textContent = `Round ${currentRound}: ${data.descrizione}`;
+    roundForm.innerHTML = "";
+
+    Object.keys(players).forEach(p => {
+      const lbl = document.createElement("label");
+      lbl.textContent = capitalize(p) + ":";
+      const inp = document.createElement("input");
+      inp.type = "number"; inp.min = "0"; inp.name = p;
+      roundForm.append(lbl, inp);
+    });
+
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "Conferma Round";
+    roundForm.appendChild(btn);
+
+    roundForm.onsubmit = e => {
+      e.preventDefault();
+      const formData = new FormData(roundForm);
+      let sum = 0;
+      const backup = { ...players };
+
+      for (const [p, v] of formData.entries()) {
+        const delta = (parseInt(v) || 0) * data.moltiplicatore;
+        players[p] += delta;
+        sum += delta;
+      }
+      // controllo del target
+      if (sum > data.target) {
+        alert(`Errore: somma ${sum} > target ${data.target}. Riprova.`);
+        players = backup;
+      }
+
       updateScoreboard();
       startNextRound();
-      return;
-    }
+    };
 
     updateScoreboard();
-    startNextRound();
-  };
-
-  updateScoreboard();
-}
-
-// Dati dei round
-function getRoundData(round) {
-  const data = {
-    1: { moltiplicatore: 8, target: 104, descrizione: "OGNI PRESA VALE 8" },
-    2: { moltiplicatore: 8, target: 208, descrizione: "OGNI CUORE VALE 8" },
-    3: { moltiplicatore: 13, target: 312, descrizione: "OGNI K O J VALE 13" },
-    4: { moltiplicatore: 26, target: 416, descrizione: "OGNI DONNA VALE 26" },
-  };
-  return data[round];
-}
-
-// Aggiorna scoreboard visivo
-function updateScoreboard() {
-  scoreList.innerHTML = "";
-  for (const player in players) {
-    const li = document.createElement("li");
-    li.textContent = `${capitalize(player)}: ${players[player]} punti`;
-    scoreList.appendChild(li);
-  }
-}
-
-// Capitalizza prima lettera
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// Round speciale 5
-function handleSpecialRound5() {
-  roundTitle.textContent = "Round 5: 8º e 13º";
-  roundForm.innerHTML = "";
-
-  const label8 = document.createElement("label");
-  label8.textContent = "Chi ha preso l'8º:";
-  const select8 = document.createElement("select");
-
-  const label13 = document.createElement("label");
-  label13.textContent = "Chi ha preso la 13º:";
-  const select13 = document.createElement("select");
-
-  for (const player in players) {
-    [select8, select13].forEach(select => {
-      const option = document.createElement("option");
-      option.value = player;
-      option.textContent = capitalize(player);
-      select.appendChild(option);
-    });
   }
 
-  roundForm.appendChild(label8);
-  roundForm.appendChild(select8);
-  roundForm.appendChild(label13);
-  roundForm.appendChild(select13);
-
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "Conferma Round";
-  submitBtn.type = "submit";
-  roundForm.appendChild(submitBtn);
-
-  roundForm.onsubmit = function (e) {
-    e.preventDefault();
-    players[select8.value] += 52;
-    players[select13.value] += 52;
-
-    updateScoreboard();
-    startNextRound();
-  };
-
-  updateScoreboard();
-}
-
-// Round speciale 6
-function handleSpecialRound6() {
-  roundTitle.textContent = "Round 6: Kappone";
-  roundForm.innerHTML = "";
-
-  const label = document.createElement("label");
-  label.textContent = "Vincitore del Kappone:";
-  const select = document.createElement("select");
-
-  for (const player in players) {
-    const option = document.createElement("option");
-    option.value = player;
-    option.textContent = capitalize(player);
-    select.appendChild(option);
+  // — Dati per i round 1–4 —
+  function getRoundData(r) {
+    return {
+      1: { moltiplicatore: 8,  target: 104, descrizione: "OGNI PRESA VALE 8" },
+      2: { moltiplicatore: 8,  target: 208, descrizione: "OGNI CUORE VALE 8" },
+      3: { moltiplicatore:13,  target: 312, descrizione: "OGNI K O J VALE 13" },
+      4: { moltiplicatore:26,  target: 416, descrizione: "OGNI DONNA VALE 26" },
+    }[r];
   }
 
-  roundForm.appendChild(label);
-  roundForm.appendChild(select);
-
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "Conferma Round";
-  submitBtn.type = "submit";
-  roundForm.appendChild(submitBtn);
-
-  roundForm.onsubmit = function (e) {
-    e.preventDefault();
-    players[select.value] += 104;
-
-    updateScoreboard();
-    startNextRound();
-  };
-
-  updateScoreboard();
-}
-
-// Round finale (7)
-function handleFinalRound() {
-  roundTitle.textContent = "Round 7: ÜBER ALLES";
-  roundForm.innerHTML = "";
-
-  const labelPlayer = document.createElement("label");
-  labelPlayer.textContent = "Giocatore:";
-  const selectPlayer = document.createElement("select");
-
-  for (const player in players) {
-    const option = document.createElement("option");
-    option.value = player;
-    option.textContent = capitalize(player);
-    selectPlayer.appendChild(option);
-  }
-
-  roundForm.appendChild(labelPlayer);
-  roundForm.appendChild(selectPlayer);
-
-  const fields = [
-    { label: "Prese (x8)", name: "prese", multiplier: 8 },
-    { label: "Cuori (x8)", name: "cuori", multiplier: 8 },
-    { label: "J/K (x13)", name: "jk", multiplier: 13 },
-    { label: "Donne (x26)", name: "donne", multiplier: 26 },
-    { label: "8º/13º (x52)", name: "mani", multiplier: 52 },
-  ];
-
-  const inputs = {};
-
-  fields.forEach(field => {
-    const lbl = document.createElement("label");
-    lbl.textContent = field.label;
-    const inp = document.createElement("input");
-    inp.type = "number";
-    inp.min = "0";
-    inp.name = field.name;
-
-    roundForm.appendChild(lbl);
-    roundForm.appendChild(inp);
-    inputs[field.name] = inp;
-  });
-
-  const labelK = document.createElement("label");
-  labelK.textContent = "Kappone?";
-  const checkK = document.createElement("input");
-  checkK.type = "checkbox";
-  checkK.name = "kcuori";
-
-  roundForm.appendChild(labelK);
-  roundForm.appendChild(checkK);
-
-  const submitBtn = document.createElement("button");
-  submitBtn.textContent = "Aggiungi punteggi";
-  submitBtn.type = "submit";
-  roundForm.appendChild(submitBtn);
-
-  roundForm.onsubmit = function (e) {
-    e.preventDefault();
-    let total = 0;
-    const sel = selectPlayer.value;
-
-    fields.forEach(field => {
-      const val = parseInt(inputs[field.name].value || "0");
-      total += val * field.multiplier;
-    });
-
-    if (checkK.checked) {
-      total += 104;
-    }
-
-    players[sel] += total;
-
-    updateScoreboard();
-    roundTitle.textContent = "Punteggio finale raggiunto! 🏆";
+  // — Round speciale 5 —
+  function handleSpecialRound5() {
+    roundTitle.textContent = "Round 5: 8º e 13º";
     roundForm.innerHTML = "";
-  };
 
-  updateScoreboard();
-}
+    const select8  = document.createElement("select");
+    const select13 = document.createElement("select");
+    Object.keys(players).forEach(p => {
+      [select8, select13].forEach(sel => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = capitalize(p);
+        sel.appendChild(opt);
+      });
+    });
+
+    const lbl8  = document.createElement("label");
+    lbl8.textContent = "Chi ha preso l'8º:";
+    const lbl13 = document.createElement("label");
+    lbl13.textContent = "Chi ha preso la 13º:";
+    roundForm.append(lbl8, select8, lbl13, select13);
+
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "Conferma Round";
+    roundForm.appendChild(btn);
+
+    roundForm.onsubmit = e => {
+      e.preventDefault();
+      players[select8.value]  += 52;
+      players[select13.value] += 52;
+      updateScoreboard();
+      startNextRound();
+    };
+
+    updateScoreboard();
+  }
+
+  // — Round speciale 6 —
+  function handleSpecialRound6() {
+    roundTitle.textContent = "Round 6: Kappone";
+    roundForm.innerHTML = "";
+
+    const select = document.createElement("select");
+    Object.keys(players).forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = capitalize(p);
+      select.appendChild(opt);
+    });
+
+    const lbl = document.createElement("label");
+    lbl.textContent = "Vincitore del Kappone:";
+    roundForm.append(lbl, select);
+
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "Conferma Round";
+    roundForm.appendChild(btn);
+
+    roundForm.onsubmit = e => {
+      e.preventDefault();
+      players[select.value] += 104;
+      updateScoreboard();
+      startNextRound();
+    };
+
+    updateScoreboard();
+  }
+
+  // — Round finale 7 —
+  function handleFinalRound() {
+    roundTitle.textContent = "Round 7: ÜBER ALLES";
+    roundForm.innerHTML = "";
+
+    const selPlayer = document.createElement("select");
+    Object.keys(players).forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = capitalize(p);
+      selPlayer.appendChild(opt);
+    });
+    const lblP = document.createElement("label");
+    lblP.textContent = "Giocatore:";
+    roundForm.append(lblP, selPlayer);
+
+    const fields = [
+      { lbl: "Prese (x8)",  name: "prese", mult: 8 },
+      { lbl: "Cuori (x8)",  name: "cuori", mult: 8 },
+      { lbl: "J/K (x13)",   name: "jk",    mult: 13 },
+      { lbl: "Donne (x26)", name: "donne", mult: 26 },
+      { lbl: "8º/13º (x52)",name: "mani",  mult: 52 },
+    ];
+    const inputs = {};
+    fields.forEach(f => {
+      const lbl = document.createElement("label");
+      lbl.textContent = f.lbl;
+      const inp = document.createElement("input");
+      inp.type = "number"; inp.min = "0"; inp.name = f.name;
+      inputs[f.name] = { el: inp, mult: f.mult };
+      roundForm.append(lbl, inp);
+    });
+
+    const lblK = document.createElement("label");
+    lblK.textContent = "Kappone?";
+    const checkK = document.createElement("input");
+    checkK.type = "checkbox"; checkK.name = "kappone";
+    roundForm.append(lblK, checkK);
+
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.textContent = "Aggiungi punteggi";
+    roundForm.appendChild(btn);
+
+    roundForm.onsubmit = e => {
+      e.preventDefault();
+      let total = 0;
+      for (const key in inputs) {
+        total += (parseInt(inputs[key].el.value) || 0) * inputs[key].mult;
+      }
+      if (checkK.checked) total += 104;
+      players[selPlayer.value] += total;
+      updateScoreboard();
+
+      // titolo e form finale
+      roundTitle.textContent = "Punteggio finale raggiunto! 🏆";
+      roundForm.innerHTML = "";
+
+      // mostro overlay e risultati
+      showEndOverlay();
+    };
+
+    updateScoreboard();
+  }
+
+  // — Overlay di fine partita —
+  // — Overlay di fine partita —
+  function showEndOverlay() {
+    // Calcolo il vincitore: chi ha il punteggio più alto
+    const winner = Object.keys(players).reduce((a, b) =>
+      players[a] > players[b] ? a : b
+    );
+    
+    // Rimuovo eventuale banner precedente
+    const old = endScreen.querySelector('.end-banner');
+    if (old) old.remove();
+
+    // Creo e appendo il banner
+    const banner = document.createElement('div');
+    banner.className = 'end-banner';
+    banner.textContent = `Il king è ${capitalize(winner)}`;
+    endScreen.appendChild(banner);
+
+    // Titolo e tabella
+    roundTitle.textContent = "La partita è finita!!";
+    roundForm.innerHTML = "";
+    scoreboardHeader.textContent = "Risultati finali:";
+    updateScoreboard();
+
+    // Mostro l’overlay
+    endScreen.style.display = "flex";
+  }
+
+  // — Aggiorna la classifica a schermo —
+  function updateScoreboard() {
+    scoreList.innerHTML = "";
+    Object.keys(players).forEach(p => {
+      const li = document.createElement("li");
+      li.textContent = `${capitalize(p)}: ${players[p]} punti`;
+      scoreList.appendChild(li);
+    });
+  }
+
+  // — Utility: maiuscola iniziale —
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+});
