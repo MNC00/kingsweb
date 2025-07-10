@@ -184,6 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // — Round finale 7 —
+  let accumulatedTotal = 0;
+
+  // — Round finale 7 con accumulo fino a 624 —
   function handleFinalRound() {
     roundTitle.textContent = "Round 7: ÜBER ALLES";
     roundForm.innerHTML = "";
@@ -211,7 +214,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const lbl = document.createElement("label");
       lbl.textContent = f.lbl;
       const inp = document.createElement("input");
-      inp.type = "number"; inp.min = "0"; inp.name = f.name;
+      inp.type = "number";
+      inp.min = "0";
+      inp.name = f.name;
       inputs[f.name] = { el: inp, mult: f.mult };
       roundForm.append(lbl, inp);
     });
@@ -219,34 +224,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const lblK = document.createElement("label");
     lblK.textContent = "Kappone?";
     const checkK = document.createElement("input");
-    checkK.type = "checkbox"; checkK.name = "kappone";
+    checkK.type = "checkbox";
+    checkK.name = "kappone";
     roundForm.append(lblK, checkK);
 
     const btn = document.createElement("button");
-    btn.type = "submit";
+    btn.type = "button"; // changed to button to use click listener
     btn.textContent = "Aggiungi punteggi";
     roundForm.appendChild(btn);
 
-    roundForm.onsubmit = e => {
+    // Gestione del click sul bottone
+    btn.addEventListener('click', e => {
       e.preventDefault();
-      let total = 0;
+      let roundTotal = 0;
       for (const key in inputs) {
-        total += (parseInt(inputs[key].el.value) || 0) * inputs[key].mult;
+        roundTotal += (parseInt(inputs[key].el.value) || 0) * inputs[key].mult;
       }
-      if (checkK.checked) total += 104;
-      players[selPlayer.value] += total;
+      if (checkK.checked) roundTotal += 104;
+
+      if (accumulatedTotal + roundTotal > 624) {
+        alert("Attenzione: il totale accumulato supererebbe 624 punti. Rivedi i valori inseriti.");
+        return;
+      }
+
+      accumulatedTotal += roundTotal;
+      players[selPlayer.value] += roundTotal;
       updateScoreboard();
 
-      // titolo e form finale
-      roundTitle.textContent = "Punteggio finale raggiunto! 🏆";
-      roundForm.innerHTML = "";
-
-      // mostro overlay e risultati
-      showEndOverlay();
-    };
+      if (accumulatedTotal === 624) {
+        roundTitle.textContent = "Punteggio finale raggiunto! 🏆";
+        roundForm.innerHTML = "";
+        showEndOverlay();
+      } else {
+        Object.values(inputs).forEach(o => o.el.value = "");
+        checkK.checked = false;
+        const remaining = 624 - accumulatedTotal;
+        roundTitle.textContent = `Ancora ${remaining} punti da inserire`;
+      }
+    });
 
     updateScoreboard();
   }
+
 
   // — Overlay di fine partita —
   // — Overlay di fine partita —
