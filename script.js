@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // — Stato di gioco —
   let players = {};
+  // storico dei round confermati (usato per rollback/modify)
+  let rounds = [];
   let currentRound = 0;
   const totalRounds = 7;
 
@@ -44,8 +46,183 @@ document.addEventListener('DOMContentLoaded', () => {
     gameSection.style.display = "block";
     scoreboardHeader.textContent = "Punteggi attuali:";
     updateScoreboard();
+    renderRoundHistory();
     startNextRound();
   });
+
+  // mostra la cronologia dei round e pulsanti per modificare
+  function renderRoundHistory() {
+    // container semplice sotto la scoreboard
+    let container = document.getElementById('round-history');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'round-history';
+      container.style.marginTop = '1rem';
+      document.querySelector('.scoreboard').appendChild(container);
+    }
+    container.innerHTML = '';
+
+    rounds.forEach((r, idx) => {
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.justifyContent = 'space-between';
+      row.style.alignItems = 'center';
+      row.style.padding = '4px 0';
+
+      const title = document.createElement('span');
+      title.textContent = `Round ${r.round}`;
+      title.classList.add('round-title'); // nuova classe
+      row.appendChild(title);
+
+      const btns = document.createElement('div');
+      const edit = document.createElement('button');
+      edit.classList.add('btn-modifica'); // nuova classe
+      edit.innerHTML = '<i class="fa fa-pen"></i> Modifica';
+      edit.addEventListener('click', () => openEditRound(idx));
+      btns.appendChild(edit);
+
+      row.appendChild(btns);
+      container.appendChild(row);
+    });
+  }
+
+  // apre l'interfaccia per modificare un round esistente
+  function openEditRound(index) {
+    const r = rounds[index];
+    if (!r) return;
+
+    // rollback fino al round precedente
+    rollbackToRoundIndex(index - 1);
+
+    // prepopola form con i dati del round da modificare
+    currentRound = r.round; // impostiamo il numero
+    roundForm.innerHTML = '';
+    roundTitle.textContent = `Modifica Round ${r.round} (${r.type})`;
+
+    if (r.type === 'standard') {
+      const data = { moltiplicatore: r.data.moltiplicatore, target: r.data.target };
+      Object.keys(players).forEach(p => {
+        const lbl = document.createElement('label');
+        lbl.textContent = capitalize(p) + ':';
+        const inp = document.createElement('input');
+        inp.type = 'number'; inp.min = '0'; inp.name = p;
+        inp.value = r.inputs[p] || 0;
+        roundForm.append(lbl, inp);
+      });
+      const btn = document.createElement('button'); btn.type = 'submit'; btn.textContent = 'Salva modifica'; roundForm.appendChild(btn);
+      roundForm.onsubmit = e => {
+        e.preventDefault();
+        const formData = new FormData(roundForm);
+        let sum = 0;
+        const inputs = {};
+        for (const [p, v] of formData.entries()) {
+          const count = parseInt(v) || 0;
+          inputs[p] = count;
+          sum += count * data.moltiplicatore;
+        }
+        if (sum > data.target) { alert(`Errore: somma ${sum} > target ${data.target}.`); return; }
+
+        // sostituisco lo storico dell'indice e ricalcolo dal punto precedente
+        rounds[index] = { round: r.round, type: 'standard', data, inputs };
+        // riapplica tutta la cronologia a partire dall'inizio
+        replayAllRounds();
+        renderRoundHistory();
+        startNextRound();
+      };
+      return;
+    }
+
+    if (r.type === 'special5') {
+      const select8  = document.createElement('select');
+      const select13 = document.createElement('select');
+      Object.keys(players).forEach(p => {
+        [select8, select13].forEach(sel => {
+          const opt = document.createElement('option'); opt.value = p; opt.textContent = capitalize(p); sel.appendChild(opt);
+        });
+      });
+      select8.value = r.winners.eight;
+      select13.value = r.winners.thirteen;
+      const lbl8  = document.createElement('label'); lbl8.textContent = "Chi ha preso l'8º:";
+      const lbl13 = document.createElement('label'); lbl13.textContent = "Chi ha preso la 13º:";
+      roundForm.append(lbl8, select8, lbl13, select13);
+      const btn = document.createElement('button'); btn.type = 'submit'; btn.textContent = 'Salva modifica'; roundForm.appendChild(btn);
+      roundForm.onsubmit = e => {
+        e.preventDefault();
+        rounds[index] = { round: r.round, type: 'special5', winners: { eight: select8.value, thirteen: select13.value } };
+        replayAllRounds(); renderRoundHistory(); startNextRound();
+      };
+      return;
+    }
+
+    if (r.type === 'special6') {
+      const select = document.createElement('select');
+      Object.keys(players).forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = capitalize(p); select.appendChild(opt); });
+      select.value = r.winner;
+      const lbl = document.createElement('label'); lbl.textContent = 'Vincitore del Kappone:'; roundForm.append(lbl, select);
+      const btn = document.createElement('button'); btn.type = 'submit'; btn.textContent = 'Salva modifica'; roundForm.appendChild(btn);
+      roundForm.onsubmit = e => { e.preventDefault(); rounds[index] = { round: r.round, type: 'special6', winner: select.value }; replayAllRounds(); renderRoundHistory(); startNextRound(); };
+      return;
+    }
+
+    if (r.type === 'final') {
+      // semplifichiamo: permettiamo di rimuovere o sostituire le entries salvate
+      roundForm.innerHTML = '';
+      const list = document.createElement('div');
+      r.entries.forEach((en, i) => {
+        const row = document.createElement('div');
+        row.textContent = `${capitalize(en.player)}: ${en.points} punti ${en.kappone ? '(Kappone)' : ''}`;
+        const del = document.createElement('button'); del.textContent = 'Rimuovi'; del.style.marginLeft='8px';
+        del.addEventListener('click', () => { r.entries.splice(i,1); rounds[index] = r; replayAllRounds(); renderRoundHistory(); openEditRound(index); });
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+      roundForm.appendChild(list);
+      const btnSave = document.createElement('button'); btnSave.type='button'; btnSave.textContent='Salva e Chiudi'; btnSave.addEventListener('click', ()=>{ rounds[index]=r; replayAllRounds(); renderRoundHistory(); startNextRound(); });
+      roundForm.appendChild(btnSave);
+      return;
+    }
+  }
+
+  // annulla tutti i punteggi e riapplica i rounds dall'inizio
+  function replayAllRounds() {
+    // reset
+    const names = Object.keys(players);
+    names.forEach(n => players[n]=0);
+    // riapplica in ordine
+    rounds.forEach(r => applyRoundData(r));
+    updateScoreboard();
+  }
+
+  // rollback fino a un dato indice (inclusivo), cioè mantieni rounds[0..idx]
+  function rollbackToRoundIndex(idx) {
+    // reset punteggi
+    const names = Object.keys(players);
+    names.forEach(n => players[n]=0);
+    // riapplica i rounds fino a idx incluso
+    for (let i=0;i<=idx && i<rounds.length;i++) {
+      applyRoundData(rounds[i]);
+    }
+    updateScoreboard();
+    // tronca lo storico alla posizione successiva a idx
+    rounds = rounds.slice(0, idx+1);
+    renderRoundHistory();
+  }
+
+  // applica i dati di un round sullo stato players
+  function applyRoundData(r) {
+    if (!r) return;
+    if (r.type === 'standard') {
+      const m = r.data.moltiplicatore;
+      Object.keys(r.inputs).forEach(p => { players[p] += (r.inputs[p]||0) * m; });
+    } else if (r.type === 'special5') {
+      players[r.winners.eight] += 52;
+      players[r.winners.thirteen] += 52;
+    } else if (r.type === 'special6') {
+      players[r.winner] += 104;
+    } else if (r.type === 'final') {
+      r.entries.forEach(en => { players[en.player] += en.points; });
+    }
+  }
 
   // — Procedi al round successivo —
   function startNextRound() {
@@ -83,20 +260,30 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const formData = new FormData(roundForm);
       let sum = 0;
-      const backup = { ...players };
 
+      // raccogli input grezzi per lo storico
+      const inputs = {};
       for (const [p, v] of formData.entries()) {
-        const delta = (parseInt(v) || 0) * data.moltiplicatore;
-        players[p] += delta;
+        const count = parseInt(v) || 0;
+        inputs[p] = count;
+        const delta = count * data.moltiplicatore;
         sum += delta;
       }
+
       // controllo del target
       if (sum > data.target) {
         alert(`Errore: somma ${sum} > target ${data.target}. Riprova.`);
-        players = backup;
+        return;
       }
 
+      // applica i punteggi e salva lo storico
+      Object.keys(inputs).forEach(p => {
+        players[p] += inputs[p] * data.moltiplicatore;
+      });
+      rounds.push({ round: currentRound, type: 'standard', data: { moltiplicatore: data.moltiplicatore, target: data.target }, inputs });
+
       updateScoreboard();
+      renderRoundHistory();
       startNextRound();
     };
 
@@ -142,10 +329,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     roundForm.onsubmit = e => {
       e.preventDefault();
-      players[select8.value]  += 52;
-      players[select13.value] += 52;
-      updateScoreboard();
-      startNextRound();
+  players[select8.value]  += 52;
+  players[select13.value] += 52;
+  rounds.push({ round: currentRound, type: 'special5', winners: { eight: select8.value, thirteen: select13.value } });
+  updateScoreboard();
+  renderRoundHistory();
+  startNextRound();
     };
 
     updateScoreboard();
@@ -175,9 +364,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     roundForm.onsubmit = e => {
       e.preventDefault();
-      players[select.value] += 104;
-      updateScoreboard();
-      startNextRound();
+  players[select.value] += 104;
+  rounds.push({ round: currentRound, type: 'special6', winner: select.value });
+  updateScoreboard();
+  renderRoundHistory();
+  startNextRound();
     };
 
     updateScoreboard();
@@ -236,6 +427,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.textContent = "Aggiungi punteggi";  
     roundForm.appendChild(btn);  
 
+    // registro degli inserimenti per questo round finale
+    const finalEntries = [];
+
     btn.addEventListener('click', e => {  
       e.preventDefault();  
 
@@ -252,6 +446,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;  
       }  
 
+      // registrazione dell'entry
+      finalEntries.push({ player: selPlayer.value, points: roundTotal, kappone: !!checkK.checked });
+
       // PRIMO INSERIMENTO: controllo chiusura anticipata  
       if (!firstEntryDone) {  
         const remainingAfterFirst = 624 - roundTotal;  
@@ -263,6 +460,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remainingAfterFirst < roundTotal) {  
           roundTitle.textContent = "Punteggio finale raggiunto! 🏆";  
           roundForm.innerHTML = "";  
+          // salvo lo storico del round finale
+          rounds.push({ round: currentRound, type: 'final', entries: finalEntries.slice() });
+          renderRoundHistory();
           showEndOverlay();  
           return;  
         }  
@@ -289,6 +489,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (accumulatedTotal === 624) {  
         roundTitle.textContent = "Punteggio finale raggiunto! 🏆";  
         roundForm.innerHTML = "";  
+        // salvo lo storico del round finale
+        rounds.push({ round: currentRound, type: 'final', entries: finalEntries.slice() });
+        renderRoundHistory();
         showEndOverlay();  
       } else {  
         const remaining = 624 - accumulatedTotal;  

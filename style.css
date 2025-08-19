@@ -307,3 +307,37 @@ footer {
   right: 1rem;
   z-index: 1001;               /* sopra banner e immagine */
 }
+
+
+/* Pulsante "Modifica" più piccolo */
+.btn-modifica {
+  display: inline-flex;               /* centra contenuto */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 120px;                   /* dimensione minima leggibile */
+  height: 40px;                       /* altezza coerente */
+  padding: 0 14px;                    /* margini orizzontali */
+  line-height: 1;                     
+  font-size: 1.25rem;                 /* testo più grande */
+  font-weight: 700;                   
+  font-family: 'Amatic SC', cursive;  /* coerenza con il sito */
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffd24c 0%, #ff9900 100%);
+  color: #4a2c00;
+  border: 1px solid #ff9900;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  margin-right: 12px;                 /* stacca dal bordo destro */
+}
+
+.btn-modifica:hover {
+  background: #ffb84c;
+}
+
+/* Testo del titolo round più grande */
+.round-title {
+  font-size: 1.8rem;   /* ingrandisci le scritte */
+  font-weight: bold;
+  color: #8b2f00;
+}
